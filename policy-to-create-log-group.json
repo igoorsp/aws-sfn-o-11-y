@@ -5,13 +5,18 @@
             "Sid": "AllowCloudWatchLogsForStepFunctions",
             "Effect": "Allow",
             "Action": [
-                "logs:CreateLogGroup",
+                "logs:CreateLogDelivery",
                 "logs:CreateLogStream",
+                "logs:GetLogDelivery",
+                "logs:UpdateLogDelivery",
+                "logs:DeleteLogDelivery",
+                "logs:ListLogDeliveries",
                 "logs:PutLogEvents",
-                "logs:DescribeLogGroups",
-                "logs:DescribeLogStreams"
+                "logs:PutResourcePolicy",
+                "logs:DescribeResourcePolicies",
+                "logs:DescribeLogGroups"
             ],
-            "Resource": "arn:aws:logs:us-east-1:ACCOUNT-ID:log-group:/aws/vendedlogs/states/*"
+            "Resource": "*"
         }
     ]
 }

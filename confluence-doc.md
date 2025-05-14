@@ -145,4 +145,58 @@ O Grafana **não possui uma funcionalidade nativa equivalente** à lista de exec
 
 ---
 
-Se quiser, posso gerar um trecho pronto com macros de Confluence como `{panel}`, `{info}`, `{expand}` para colar direto na sua wiki. Deseja isso?
+Perfeito! Seguindo o mesmo padrão do tópico anterior (“Lista de Executions”), aqui está a **estrutura do novo tópico** “Interações sobre as Executions”, com as seções divididas entre **AWS Step Functions – Console** e **Grafana**, explicando o que é possível fazer em cada uma.
+
+---
+
+## 🛠️ Interações sobre as Executions
+
+### 🟦 AWS Step Functions – Console
+
+O Console da AWS fornece uma interface interativa para gerenciar execuções em tempo real. Ao selecionar uma execução (especialmente as com falha), são exibidas opções úteis de ação, como:
+
+* 🔁 **Redrive Execution** – Reexecutar a mesma máquina de estados com os mesmos dados de entrada.
+* ⛔ **Stop Execution** – Interromper imediatamente a execução em andamento.
+* 📎 Visualizar input/output de cada estado.
+* 🔍 Detalhes visuais de onde ocorreu a falha, facilitando o troubleshooting.
+
+> 📸 *Exemplo de execução com falha mostrando os botões disponíveis no Console:*
+
+!\[aws-stepfunctions-redrive-stop.png]
+
+---
+
+### 📊 Grafana (CloudWatch Logs / Métricas)
+
+O Grafana **não permite interação direta** com as execuções da Step Functions. Ele é uma ferramenta de **observabilidade**, não de controle. Isso significa:
+
+* ❌ **Não é possível dar Redrive em uma execução**.
+* ❌ **Não é possível interromper (Stop) uma execução em andamento**.
+* ✅ É possível monitorar e identificar falhas, mas **todas as ações precisam ser feitas externamente** (via SDK/API ou automações).
+
+#### Alternativas sugeridas:
+
+* Para habilitar operações como Redrive ou Stop fora do Console, recomenda-se:
+
+  * Criar endpoints internos (ex: via API Gateway + Lambda) que executem `StartExecution`, `StopExecution` ou `DescribeExecution` via SDK.
+  * Adicionar automações via CLI para gerenciamento de execuções críticas.
+  * Criar um botão de Redrive em outra interface interna, se necessário, chamando o SDK.
+
+> 📸 *Exemplo de painel que destaca falhas em execuções, mas sem opções de interação:*
+
+!\[grafana-failed-execution-panel.png]
+
+---
+
+### ✅ Conclusão do Comparativo
+
+| Ação                           | Console AWS | Grafana      |
+| ------------------------------ | ----------- | ------------ |
+| Redrive Execution              | ✅           | ❌            |
+| Stop Execution                 | ✅           | ❌            |
+| Visualização de erro detalhado | ✅           | ✅ (via logs) |
+| Reexecução manual              | ✅           | ❌            |
+| Operação em tempo real         | ✅           | ❌            |
+
+---
+

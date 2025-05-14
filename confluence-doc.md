@@ -85,4 +85,64 @@ Para ambientes restritos, é recomendável:
 
 ---
 
-Se desejar, posso converter esse conteúdo em formato Markdown (.md) ou gerar diretamente para o Confluence com macros (`{expand}`, `{info}`, etc.). Deseja essa versão também?
+Ótima abordagem. Quando no **Grafana não há uma funcionalidade equivalente direta**, como no caso da **lista de executions com colunas e paginação do Console**, você pode deixar o conteúdo bem informativo com uma explicação clara + print de uma **alternativa parcial** (como um painel de execuções baseado em logs agregados).
+
+Aqui está um exemplo de como escrever isso no tópico “Lista de Executions” da sua documentação:
+
+---
+
+## 🔁 Lista de Executions
+
+### 🟦 AWS Step Functions – Console
+
+A interface do console da AWS permite visualizar, de forma tabular e interativa, todas as execuções da state machine, com colunas como:
+
+* **Name/Execution ARN**
+* **Status** (Running, Succeeded, Failed, etc.)
+* **Start time**
+* **End time**
+* **Duration**
+
+> 📸 *Abaixo, print da lista de execuções no console da AWS:*
+
+!\[aws-stepfunctions-execution-list.png]
+
+---
+
+### 📊 Grafana (CloudWatch Logs + Métricas)
+
+O Grafana **não possui uma funcionalidade nativa equivalente** à lista de execuções com as mesmas colunas e interações. No entanto, é possível construir uma **visualização parcial** com base nos logs e métricas enviados pelo Step Functions para o CloudWatch.
+
+#### 🛠️ Alternativa possível:
+
+É possível montar um painel que exibe uma **tabela resumida** com as execuções recentes, agrupadas por `executionArn`, contendo por exemplo:
+
+* Execution ARN
+* Status (extraído via log parsing)
+* StartTime e EndTime (calculado via timestamp do primeiro e último log)
+* Duração da execução (calculada)
+
+> ❗ **Limitações importantes**:
+>
+> * Não há paginação ou ordenação interativa.
+> * Requer parsing correto dos logs (ex: `execution_arn`, `status`, timestamps).
+> * É necessário configurar manualmente a query no Grafana (LogQL ou AWS Logs Insights).
+
+> 📸 *Exemplo de painel construído no Grafana (substituindo a lista do Console):*
+
+!\[grafana-execution-summary-table.png]
+
+---
+
+### ✅ Conclusão do Comparativo
+
+| Recurso                                  | Console AWS | Grafana                   |
+| ---------------------------------------- | ----------- | ------------------------- |
+| Lista interativa e paginada              | ✅           | ❌                         |
+| Colunas nativas (status, tempo, duração) | ✅           | ⚠️ (manualmente via logs) |
+| Visualização agrupada por execução       | ✅           | ✅ (limitado)              |
+| Facilidade de busca e ordenação          | ✅           | ⚠️ (limitada por query)   |
+
+---
+
+Se quiser, posso gerar um trecho pronto com macros de Confluence como `{panel}`, `{info}`, `{expand}` para colar direto na sua wiki. Deseja isso?

@@ -1,0 +1,11 @@
+fields @message
+| parse @message /"execution_arn":"(?<executionArn>[^"]+)"/
+| parse @message /"type":"(?<stateType>[^"]+)"/
+| parse @message /"event_timestamp":"(?<eventTime>\d+)"/
+| stats 
+    min(eventTime) as startTime,
+    max(eventTime) as endTime,
+    count(*) as totalEvents 
+    by executionArn
+| display executionArn, startTime, endTime, (endTime - startTime)/1000 as durationSeconds
+| sort endTime desc

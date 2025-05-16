@@ -5,24 +5,13 @@ fields @message
 | stats 
     min(eventTime) as startTime,
     max(eventTime) as endTime,
+    latest(stateType) as status,
     count(*) as totalEvents 
     by executionArn
-| display executionArn, startTime, endTime, (endTime - startTime)/1000 as durationSeconds
+| fields if(status = "ExecutionSucceeded", "SUCCEEDED",
+      if(status = "ExecutionFailed", "FAILED",
+      if(status = "ExecutionTimedOut", "TIMED_OUT",
+      if(status = "ExecutionAborted", "ABORTED",
+      if(status = "ExecutionStarted", "RUNNING", "PENDING"))))) as executionStatus
+| display executionArn, executionStatus, status, startTime, endTime, (endTime - startTime)/1000 as durationSeconds, totalEvents
 | sort endTime desc
-
-
-
-
-
-fields @message
-| parse @message /"type":"(?<eventType>[^"]+)"/
-| parse @message /"execution_arn":"(?<executionArn>[^"]+)"/
-| parse @message /"event_timestamp":"(?<eventTime>\d+)"/
-| stats latest(eventType) as lastEventType, max(eventTime) as lastEventTime by executionArn
-| fields if(lastEventType = "ExecutionSucceeded", "SUCCEEDED",
-      if(lastEventType = "ExecutionFailed", "FAILED",
-      if(lastEventType = "ExecutionTimedOut", "TIMED_OUT",
-      if(lastEventType = "ExecutionAborted", "ABORTED",
-      if(lastEventType = "ExecutionStarted", "RUNNING", "PENDING"))))) as executionStatus
-| display executionArn, executionStatus, lastEventTime
-| sort lastEventTime desc

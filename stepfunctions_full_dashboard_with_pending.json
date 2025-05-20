@@ -1,0 +1,449 @@
+{
+  "id": null,
+  "uid": "stepfunctions-full-dashboard",
+  "title": "Step Functions - Vis\u00e3o Completa",
+  "tags": [
+    "stepfunctions",
+    "negocios",
+    "execucao"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Total de Execu\u00e7\u00f5es",
+      "id": 1,
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "your-cloudwatch-uid"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "queryMode": "Logs",
+          "region": "us-east-1",
+          "logGroups": [
+            {
+              "name": "/aws/vendedlogs/states/SimpleStartStateMachine-Logs"
+            }
+          ],
+          "expression": "fields @message\n| parse @message /\"type\":\"(?<type>[^\"]+)\"/\n| filter type like /Execution/\n| stats count(*) as total"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "value",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "piechart",
+      "title": "Distribui\u00e7\u00e3o por Status",
+      "id": 2,
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "your-cloudwatch-uid"
+      },
+      "targets": [
+        {
+          "refId": "B",
+          "queryMode": "Logs",
+          "region": "us-east-1",
+          "logGroups": [
+            {
+              "name": "/aws/vendedlogs/states/SimpleStartStateMachine-Logs"
+            }
+          ],
+          "expression": "fields @message\n| parse @message /\"type\":\"(?<type>[^\"]+)\"/\n| filter type like /Execution/\n| stats count(*) by type"
+        }
+      ],
+      "options": {
+        "displayLabels": [
+          "value",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "pieType": "pie"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Execu\u00e7\u00f5es com Sucesso",
+      "id": 3,
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 12
+      },
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "your-cloudwatch-uid"
+      },
+      "targets": [
+        {
+          "refId": "C",
+          "queryMode": "Logs",
+          "region": "us-east-1",
+          "logGroups": [
+            {
+              "name": "/aws/vendedlogs/states/SimpleStartStateMachine-Logs"
+            }
+          ],
+          "expression": "fields @message\n| parse @message /\"type\":\"(?<type>[^\"]+)\"/\n| filter type = \"ExecutionSucceeded\"\n| stats count() as total"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "value",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Execu\u00e7\u00f5es com Erro",
+      "id": 4,
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 12
+      },
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "your-cloudwatch-uid"
+      },
+      "targets": [
+        {
+          "refId": "D",
+          "queryMode": "Logs",
+          "region": "us-east-1",
+          "logGroups": [
+            {
+              "name": "/aws/vendedlogs/states/SimpleStartStateMachine-Logs"
+            }
+          ],
+          "expression": "fields @message\n| parse @message /\"type\":\"(?<type>[^\"]+)\"/\n| filter type = \"ExecutionFailed\"\n| stats count() as total"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "value",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Execu\u00e7\u00f5es em Andamento",
+      "id": 5,
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 16,
+        "y": 12
+      },
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "your-cloudwatch-uid"
+      },
+      "targets": [
+        {
+          "refId": "E",
+          "queryMode": "Logs",
+          "region": "us-east-1",
+          "logGroups": [
+            {
+              "name": "/aws/vendedlogs/states/SimpleStartStateMachine-Logs"
+            }
+          ],
+          "expression": "fields @message\n| parse @message /\"type\":\"(?<type>[^\"]+)\"/\n| filter type = \"ExecutionStarted\"\n| stats count() as total"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "value",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Tempo M\u00e9dio de Execu\u00e7\u00e3o (s)",
+      "id": 6,
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 16
+      },
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "your-cloudwatch-uid"
+      },
+      "targets": [
+        {
+          "refId": "F",
+          "queryMode": "Logs",
+          "region": "us-east-1",
+          "logGroups": [
+            {
+              "name": "/aws/vendedlogs/states/SimpleStartStateMachine-Logs"
+            }
+          ],
+          "expression": "fields @message\n| parse @message /\"execution_arn\":\"(?<executionArn>[^\"]+)\"/\n| parse @message /\"type\":\"(?<type>[^\"]+)\"/\n| parse @message /\"event_timestamp\":\"(?<eventTime>\\d+)\"/\n| filter type in [\"ExecutionStarted\", \"ExecutionSucceeded\", \"ExecutionFailed\", \"ExecutionAborted\"]\n| stats min(eventTime) as startTime, max(eventTime) as endTime by executionArn\n| display avg((endTime - startTime)/1000) as avgDurationSeconds"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "value",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "table",
+      "title": "\u00daltimas Execu\u00e7\u00f5es com Erro",
+      "id": 7,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "your-cloudwatch-uid"
+      },
+      "targets": [
+        {
+          "refId": "G",
+          "queryMode": "Logs",
+          "region": "us-east-1",
+          "logGroups": [
+            {
+              "name": "/aws/vendedlogs/states/SimpleStartStateMachine-Logs"
+            }
+          ],
+          "expression": "fields @message\n| parse @message /\"execution_arn\":\"(?<executionArn>[^\"]+)\"/\n| parse @message /\"type\":\"(?<type>[^\"]+)\"/\n| parse @message /\"event_timestamp\":\"(?<eventTime>\\d+)\"/\n| filter type = \"ExecutionFailed\"\n| sort eventTime desc\n| display eventTime, executionArn, type, @message"
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        },
+        "sortBy": [
+          {
+            "displayName": "eventTime",
+            "desc": true
+          }
+        ]
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    },
+    {
+      "type": "table",
+      "title": "\u00daltimas Execu\u00e7\u00f5es Pendentes",
+      "id": 8,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "celsyuz6loc1sf"
+      },
+      "targets": [
+        {
+          "refId": "H",
+          "queryMode": "Logs",
+          "region": "us-east-1",
+          "logGroups": [
+            {
+              "accountId": "835996031136",
+              "arn": "arn:aws:logs:us-east-1:835996031136:log-group:/aws/vendedlogs/states/SimpleStartStateMachine-Logs:*",
+              "name": "/aws/vendedlogs/states/SimpleStartStateMachine-Logs"
+            }
+          ],
+          "expression": "fields @message\n| parse @message /\"execution_arn\":\"(?<executionArn>[^\"]+)\"/\n| parse @message /\"type\":\"(?<type>[^\"]+)\"/\n| parse @message /\"event_timestamp\":\"(?<eventTime>\\d+)\"/\n| filter type = \"ExecutionStarted\"\n| sort eventTime desc\n| display eventTime, executionArn, type, @message"
+        }
+      ],
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "eventTime"
+          }
+        ]
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  }
+}

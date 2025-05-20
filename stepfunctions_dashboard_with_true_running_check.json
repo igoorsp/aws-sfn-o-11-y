@@ -1,0 +1,96 @@
+{
+  "id": null,
+  "uid": "stepfunctions-full-dashboard",
+  "title": "Step Functions - Vis\u00e3o Completa",
+  "tags": [
+    "stepfunctions",
+    "negocios",
+    "execucao"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 40,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "type": "table",
+      "title": "Execu\u00e7\u00f5es em Andamento (\u00daltimo Evento N\u00e3o Finalizador)",
+      "id": 1,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "celsyuz6loc1sf"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "queryMode": "Logs",
+          "region": "us-east-1",
+          "logGroups": [
+            {
+              "accountId": "835996031136",
+              "arn": "arn:aws:logs:us-east-1:835996031136:log-group:/aws/vendedlogs/states/SimpleStartStateMachine-Logs:*",
+              "name": "/aws/vendedlogs/states/SimpleStartStateMachine-Logs"
+            }
+          ],
+          "expression": "fields @message\n| parse @message /\"execution_arn\":\"(?<executionArn>[^\"]+)\"/\n| parse @message /\"type\":\"(?<type>[^\"]+)\"/\n| parse @message /\"event_timestamp\":\"(?<eventTime>\\d+)\"/\n| sort eventTime desc\n| stats first(type) as lastType, max(eventTime) as lastEventTime by executionArn\n| filter lastType not in [\"ExecutionSucceeded\", \"ExecutionFailed\", \"ExecutionAborted\", \"ExecutionTimedOut\"]\n| sort lastEventTime desc"
+        }
+      ],
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "lastEventTime"
+          }
+        ]
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "time": {
+    "from": "now-2d",
+    "to": "now"
+  }
+}

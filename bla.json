@@ -1,0 +1,175 @@
+{
+  "id": null,
+  "uid": "stepfunctions-cockpit",
+  "title": "Step Functions - Cockpit",
+  "tags": [
+    "stepfunctions",
+    "cockpit",
+    "bpm",
+    "monitoramento"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 40,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Total de Execu\u00e7\u00f5es",
+      "id": 1,
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "celsyuz6loc1sf"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "queryMode": "Logs",
+          "region": "us-east-1",
+          "logGroups": [
+            {
+              "name": "/aws/vendedlogs/states/SimpleStartStateMachine-Logs"
+            }
+          ],
+          "expression": "fields @message | parse @message /\"type\":\"(?<type>[^\"]+)\"/ | filter type like /Execution/ | stats count()"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "value",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "piechart",
+      "title": "Distribui\u00e7\u00e3o de Status das Execu\u00e7\u00f5es",
+      "id": 2,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 6,
+        "y": 0
+      },
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "celsyuz6loc1sf"
+      },
+      "targets": [
+        {
+          "refId": "B",
+          "queryMode": "Logs",
+          "region": "us-east-1",
+          "logGroups": [
+            {
+              "name": "/aws/vendedlogs/states/SimpleStartStateMachine-Logs"
+            }
+          ],
+          "expression": "fields @message | parse @message /\"type\":\"(?<type>[^\"]+)\"/ | filter type like /Execution/ | stats count() by type"
+        }
+      ],
+      "options": {
+        "displayLabels": [
+          "value",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "pieType": "pie"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    },
+    {
+      "type": "table",
+      "title": "Hist\u00f3rico de Eventos da Execu\u00e7\u00e3o Selecionada",
+      "id": 3,
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "celsyuz6loc1sf"
+      },
+      "targets": [
+        {
+          "refId": "C",
+          "queryMode": "Logs",
+          "region": "us-east-1",
+          "logGroups": [
+            {
+              "name": "/aws/vendedlogs/states/SimpleStartStateMachine-Logs"
+            }
+          ],
+          "expression": "fields @message\n| parse @message /\"execution_arn\":\"(?<executionArn>[^\"]+)\"/\n| parse @message /\"type\":\"(?<type>[^\"]+)\"/\n| parse @message /\"event_timestamp\":\"(?<eventTime>\\d+)\"/\n| filter executionArn = '$executionArn'\n| sort eventTime desc\n| display eventTime, type, @message"
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "displayName": "eventTime",
+            "desc": true
+          }
+        ]
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "executionArn",
+        "type": "textbox",
+        "label": "Execution ARN",
+        "query": "",
+        "hide": 0
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "time": {
+    "from": "now-2d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "weekStart": ""
+}
